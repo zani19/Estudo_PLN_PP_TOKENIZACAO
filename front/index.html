@@ -1,34 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title>Raspagem de Dados</title>
-</head>
-<body>
-  <h1>Inserir URL para Raspagem</h1>
-  <form id="scrapeForm">
-    <input type="text" id="urlInput" placeholder="Digite a URL" required>
-    <button type="submit">Raspar Dados</button>
-  </form>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Raspagem de Dados</title>
+  </head>
+  <body>
+    <h1>Inserir URL para Raspagem</h1>
+    <form id="scrapeForm">
+      <input type="text" id="urlInput" placeholder="Digite a URL" required />
+      <button type="submit">Raspar Dados</button>
+    </form>
 
-  <div id="result" style="margin-top: 20px;"></div>
+    <div id="result" style="margin-top: 20px"></div>
 
-  <script>
-    document.getElementById('scrapeForm').addEventListener('submit', async function (e) {
-      e.preventDefault();
-      const url = document.getElementById('urlInput').value;
+    <script>
+      document
+        .getElementById("scrapeForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+          const url = document.getElementById("urlInput").value;
 
-      const response = await fetch('/scrape', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: url })
-      });
+          const response = await fetch("http://127.0.0.1:5000/scrape", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url: url }),
+          });
 
-      const data = await response.json();
-      document.getElementById('result').innerHTML = `
-        <p><strong>Tempo de raspagem:</strong> ${data.scrape_time} ms</p>
-      `;
-    });
-  </script>
-</body>
+          const data = await response.json();
+          document.getElementById("result").innerHTML = `
+    <p><strong>Tempo de raspagem:</strong> ${data.scrape_time} ms</p>
+    <p><strong>Tempo de remoção de ruído:</strong> ${data.clean_time} ms</p>
+    <p><strong>Texto limpo (preview):</strong><br>${data.cleaned_text}</p>
+  `;
+        });
+    </script>
+  </body>
 </html>
