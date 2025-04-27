@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>Raspagem de Dados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css"/>
+
   </head>
   <body>
     <h1>Inserir URL para Raspagem</h1>
@@ -11,7 +14,21 @@
       <button type="submit">Raspar Dados</button>
     </form>
 
-    <div id="result" style="margin-top: 20px"></div>
+    <div id="result" style="margin-top: 20px">
+      <table border="1" style="width: 100%; text-align: left;">
+        <thead>
+          <tr>
+            <th>Entrada</th>
+            <th>Saída</th>
+            <th>Etapa</th>
+            <th>Tempo</th>
+          </tr>
+        </thead>
+        <tbody id="resultTableBody">
+          <!-- Os resultados serão inseridos aqui -->
+        </tbody>
+      </table>
+    </div>
 
     <script>
       document
@@ -27,11 +44,32 @@
           });
 
           const data = await response.json();
-          document.getElementById("result").innerHTML = `
-    <p><strong>Tempo de raspagem:</strong> ${data.scrape_time} ms</p>
-    <p><strong>Tempo de remoção de ruído:</strong> ${data.clean_time} ms</p>
-    <p><strong>Texto limpo (preview):</strong><br>${data.cleaned_text}</p>
-  `;
+
+          const tableBody = document.getElementById("resultTableBody");
+          tableBody.innerHTML = ""; // Limpa a tabela antes de adicionar novos dados
+
+          // Adiciona a linha da raspagem
+          const row1 = document.createElement("tr");
+          row1.innerHTML = `
+            <td>${url}</td>
+            <td><pre></pre></td>
+            <td>Raspagem</td>
+            <td>${data.scrape_time} ms</td>
+          `;
+          row1.querySelector("pre").textContent = data.raw_html; // Exibe o HTML como texto puro
+          tableBody.appendChild(row1);
+
+          // Adiciona a linha da remoção de ruído
+          const row2 = document.createElement("tr");
+          row2.innerHTML = `
+            <td><pre></pre></td>
+            <td><pre></pre></td>
+            <td>Remoção de ruído</td>
+            <td>${data.clean_time} ms</td>
+          `;
+          row2.querySelectorAll("pre")[0].textContent = data.raw_html; // Exibe o HTML bruto como texto puro
+          row2.querySelectorAll("pre")[1].textContent = data.cleaned_text; // Exibe o texto limpo como texto puro
+          tableBody.appendChild(row2);
         });
     </script>
   </body>

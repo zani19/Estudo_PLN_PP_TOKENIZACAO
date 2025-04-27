@@ -4,24 +4,24 @@ from bs4 import BeautifulSoup
 import time
 from flask_cors import CORS
 
-
 app = Flask(__name__)
 CORS(app)
 
 @app.route('/scrape', methods=['POST'])
-
 def scrape():
     data = request.get_json()
     url = data['url']
 
+    # Raspagem de dados
     start_time = time.time()
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
     end_time = time.time()
 
     scrape_time_ms = (end_time - start_time) * 1000  # em milissegundos
-    
-    # Remoção de Ruído
+    raw_html = soup.prettify()  # HTML bruto raspado
+
+    # Remoção de ruído
     start_clean = time.time()
     cleaned_text = clean_html(soup)
     end_clean = time.time()
@@ -31,7 +31,8 @@ def scrape():
     return jsonify({
         'scrape_time': round(scrape_time_ms, 2),
         'clean_time': round(clean_time_ms, 2),
-        'cleaned_text': cleaned_text[:500] + '...',  # Opcional: mandar só os 500 primeiros caracteres
+        'raw_html': raw_html[:500],
+        'cleaned_text': cleaned_text[:200],
         'status': 'success'
     })
 
@@ -46,7 +47,6 @@ def clean_html(soup):
     # Remove espaços em excesso
     cleaned_text = ' '.join(text.split())
     return cleaned_text
-
 
 if __name__ == '__main__':
     app.run(debug=True)
