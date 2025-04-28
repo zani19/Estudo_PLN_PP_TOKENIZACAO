@@ -112,6 +112,7 @@ def scrape():
         'expanded_text': expanded_text[:500],
         'sentences': formatted_sentences,
         'words': formatted_words,
+        'corrected_text': corrected_text,
         'status': 'success'
     })
     
