@@ -4,8 +4,7 @@
     <meta charset="UTF-8" />
     <title>Raspagem de Dados</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./style.css"/>
-
+    <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <h1>Inserir URL para Raspagem</h1>
@@ -15,7 +14,7 @@
     </form>
 
     <div id="result" style="margin-top: 20px">
-      <table border="1" style="width: 100%; text-align: left;">
+      <table border="1" style="width: 100%; text-align: left">
         <thead>
           <tr>
             <th>Entrada</th>
@@ -70,6 +69,38 @@
           row2.querySelectorAll("pre")[0].textContent = data.raw_html; // Exibe o HTML bruto como texto puro
           row2.querySelectorAll("pre")[1].textContent = data.cleaned_text; // Exibe o texto limpo como texto puro
           tableBody.appendChild(row2);
+
+          // Tokenização por frases
+          const row3 = document.createElement("tr");
+          row3.innerHTML = `
+            <td><pre></pre></td>
+            <td><pre></pre></td>
+            <td>Tokenização por frases</td>
+            <td>${data.sent_tokenize_time} ms</td>
+          `;
+          row3.querySelectorAll("pre")[0].textContent = data.cleaned_text;
+          row3.querySelectorAll("pre")[1].textContent = data.sentences
+            .map((sentence, index) => `${index + 1}. ${sentence}`)
+            .join("\n");
+          tableBody.appendChild(row3);
+
+          // Tokenização por palavras dentro de frases
+          const row4 = document.createElement("tr");
+          row4.innerHTML = `
+            <td><pre></pre></td>
+            <td><pre></pre></td>
+            <td>Tokenização por palavras</td>
+            <td>${data.word_tokenize_time} ms</td>
+          `;
+          row4.querySelectorAll("pre")[0].textContent = data.sentences
+            .map((sentence, index) => `${index + 1}. ${sentence}`)
+            .join("\n");
+          row4.querySelectorAll("pre")[1].textContent = data.words
+            .map(
+              (wordList, index) => `${index + 1}. [${wordList.join(", ")}]` // Exibe as palavras dentro de cada frase
+            )
+            .join("\n");
+          tableBody.appendChild(row4);
         });
     </script>
   </body>

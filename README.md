@@ -4,5 +4,5 @@ Repositório destinado a atividade de PLN - TOKENIZAÇÃO e ERROS ORTOGRÁFICOS
 backend:
 python -m venv env
 .\env\Scripts\activate
-pip install flask requests beautifulsoup4 flask-cors
-python scrape.py
+pip install flask requests beautifulsoup4 flask-cors nltk
+python app.py
