@@ -51,56 +51,83 @@
           const row1 = document.createElement("tr");
           row1.innerHTML = `
             <td>${url}</td>
-            <td><pre></pre></td>
+            <td><pre>${data.raw_html}</pre></td>
             <td>Raspagem</td>
             <td>${data.scrape_time} ms</td>
           `;
-          row1.querySelector("pre").textContent = data.raw_html; // Exibe o HTML como texto puro
           tableBody.appendChild(row1);
 
           // Adiciona a linha da remoção de ruído
           const row2 = document.createElement("tr");
           row2.innerHTML = `
-            <td><pre></pre></td>
-            <td><pre></pre></td>
+            <td><pre>${data.raw_html}</pre></td>
+            <td><pre>${data.cleaned_text}</pre></td>
             <td>Remoção de ruído</td>
             <td>${data.clean_time} ms</td>
           `;
-          row2.querySelectorAll("pre")[0].textContent = data.raw_html; // Exibe o HTML bruto como texto puro
-          row2.querySelectorAll("pre")[1].textContent = data.cleaned_text; // Exibe o texto limpo como texto puro
           tableBody.appendChild(row2);
 
-          // Tokenização por frases
+          // Conversão para minúsculas
           const row3 = document.createElement("tr");
           row3.innerHTML = `
-            <td><pre></pre></td>
-            <td><pre></pre></td>
+            <td><pre>${data.cleaned_text}</pre></td>
+            <td><pre>${data.lower_text}</pre></td>
+            <td>Conversão para minúsculas</td>
+            <td>${data.lower_time} ms</td>
+          `;
+          tableBody.appendChild(row3);
+
+          // Expansão de siglas e abreviações
+          const row4 = document.createElement("tr");
+          row4.innerHTML = `
+            <td><pre>${data.lower_text}</pre></td>
+            <td><pre>${data.expanded_text}</pre></td>
+            <td>Expansão de siglas e abreviações</td>
+            <td>${data.expand_time} ms</td>
+          `;
+          tableBody.appendChild(row4);
+
+          // Tokenização por frases
+          const row5 = document.createElement("tr");
+          row5.innerHTML = `
+            <td><pre>${data.expanded_text}</pre></td>
+            <td><pre>${data.sentences
+              .map((sentence, index) => `${index + 1}. ${sentence}`)
+              .join("\n")}</pre></td>
             <td>Tokenização por frases</td>
             <td>${data.sent_tokenize_time} ms</td>
           `;
-          row3.querySelectorAll("pre")[0].textContent = data.cleaned_text;
-          row3.querySelectorAll("pre")[1].textContent = data.sentences
-            .map((sentence, index) => `${index + 1}. ${sentence}`)
-            .join("\n");
-          tableBody.appendChild(row3);
+          tableBody.appendChild(row5);
 
-          // Tokenização por palavras dentro de frases
-          const row4 = document.createElement("tr");
-          row4.innerHTML = `
-            <td><pre></pre></td>
-            <td><pre></pre></td>
+          // Tokenização por palavras
+          const row6 = document.createElement("tr");
+          row6.innerHTML = `
+            <td><pre>${data.sentences
+              .map((sentence, index) => `${index + 1}. ${sentence}`)
+              .join("\n")}</pre></td>
+            <td><pre>${data.words
+              .map(
+                (wordList, index) => `${index + 1}. [${wordList.join(", ")}]`
+              )
+              .join("\n")}</pre></td>
             <td>Tokenização por palavras</td>
             <td>${data.word_tokenize_time} ms</td>
           `;
-          row4.querySelectorAll("pre")[0].textContent = data.sentences
-            .map((sentence, index) => `${index + 1}. ${sentence}`)
-            .join("\n");
-          row4.querySelectorAll("pre")[1].textContent = data.words
-            .map(
-              (wordList, index) => `${index + 1}. [${wordList.join(", ")}]` // Exibe as palavras dentro de cada frase
-            )
-            .join("\n");
-          tableBody.appendChild(row4);
+          tableBody.appendChild(row6);
+
+          // Correção ortográfica
+          const row7 = document.createElement("tr");
+          row7.innerHTML = `
+            <td><pre>${data.words
+              .map(
+                (wordList, index) => `${index + 1}. [${wordList.join(", ")}]`
+              )
+              .join("\n")}</pre></td>
+            <td><pre>${data.corrected_text}</pre></td>
+            <td>Correção ortográfica</td>
+            <td>${data.spell_time} ms</td>
+          `;
+          tableBody.appendChild(row7);
         });
     </script>
   </body>
