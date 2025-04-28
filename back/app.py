@@ -9,6 +9,7 @@ from spellchecker import SpellChecker
 import re
 
 nltk.download('punkt')
+nltk.download('punkt_tab')
 
 app = Flask(__name__)
 CORS(app)
