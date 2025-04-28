@@ -23,7 +23,7 @@ def scrape():
 
     # Remoção de ruído
     start_clean = time.time()
-    cleaned_text = clean_html(soup)
+    cleaned_text = extract_reviews(soup, url)  # Extrai apenas os comentários
     end_clean = time.time()
 
     clean_time_ms = (end_clean - start_clean) * 1000  # em milissegundos
@@ -31,22 +31,44 @@ def scrape():
     return jsonify({
         'scrape_time': round(scrape_time_ms, 2),
         'clean_time': round(clean_time_ms, 2),
-        'raw_html': raw_html[:500],
-        'cleaned_text': cleaned_text[:200],
+        'raw_html': raw_html[:500],  # Limita o HTML bruto a 500 caracteres
+        'cleaned_text': cleaned_text[:500],  # Limita o texto limpo a 500 caracteres
         'status': 'success'
     })
 
-def clean_html(soup):
-    # Remover scripts e styles
-    for script_or_style in soup(["script", "style", "meta", "noscript", "header", "footer", "head"]):
-        script_or_style.extract()
+def extract_reviews(soup, url):
+    """
+    Localiza e extrai os comentários dos usuários com base em classes ou tags específicas.
+    """
+    reviews = []
 
-    # Pega o texto limpo
-    text = soup.get_text(separator=' ')
+    # Verifica se é Mercado Livre
+    if "mercadolivre" in url or "mercadolivre.com" in url:
+        # Busca o resumo das avaliações no Mercado Livre
+        summary = soup.find_all("p", class_="ui-review-capability__summary__plain_text__summary_container")
+        print("Resumo encontrado no Mercado Livre:", summary)
+        reviews.extend([item.get_text(strip=True) for item in summary])
 
-    # Remove espaços em excesso
-    cleaned_text = ' '.join(text.split())
-    return cleaned_text
+    # Verifica se é Amazon
+    elif "amazon" in url or "amazon.com" in url:
+        # Busca os comentários individuais na Amazon
+        detailed_reviews = soup.find_all("div", {"data-hook": "review-collapsed"})
+        print("Comentários detalhados encontrados na Amazon:", detailed_reviews)
+        for review in detailed_reviews:
+            # Extrai o texto dentro de <span> (se existir)
+            span = review.find("span", {"data-hook": "review-body"})
+            if span:
+                reviews.append(span.get_text(strip=True))
+            else:
+                # Caso não haja <span>, extrai o texto diretamente do <div>
+                reviews.append(review.get_text(strip=True))
+
+    # Caso nenhum comentário seja encontrado
+    if not reviews:
+        print("Nenhum comentário encontrado.")
+        return "Nenhum comentário encontrado."
+
+    return '\n'.join(reviews)  # Junta os comentários em um único texto com quebras de linha
 
 if __name__ == '__main__':
     app.run(debug=True)
